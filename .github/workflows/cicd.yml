@@ -24,7 +24,7 @@ jobs:
           NOMBRE_USR: ${{ secrets.NOMBRE_USR }}
       - name: Esperar y probar un endpoint
         run: |
-          sleep 10
+          sleep 30
           curl http://localhost:8080/actuator/health
       - name: Detener la aplicación
         run: pkill -f 'org.springframework.boot.loader.JarLauncher'
