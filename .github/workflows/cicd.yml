@@ -18,7 +18,14 @@ jobs:
           distribution: 'temurin'
           java-version: '25'
       - name: Compilar el proyecto
-        run: mvn spring-boot:run &
+        run: mvn clean package -DskipTests
+        env:
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          NOMBRE_USR: ${{ secrets.NOMBRE_USR }}
+      - name: Ejecutar el proyecto
+        run: |
+          java -jar target/ejemplo02-0.0.1-SNAPSHOT.jar &
+          echo $! > springboot.pid
         env:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           NOMBRE_USR: ${{ secrets.NOMBRE_USR }}
@@ -27,4 +34,4 @@ jobs:
           sleep 30
           curl http://localhost:8080/actuator/health
       - name: Detener la aplicación
-        run: pkill -f 'org.springframework.boot.loader.JarLauncher'
+        run: kill -9 $(cat springboot.pid)
