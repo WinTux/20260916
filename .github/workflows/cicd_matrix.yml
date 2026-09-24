@@ -1,0 +1,46 @@
+name: CI/CD Pipeline con Matrix Build
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  compilacion:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        java: [25, 26]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.1.0
+      - name: Configurar JDK ${{ matrix.java }}
+        uses: actions/setup-java@v6.0.1
+        with:
+          distribution: 'temurin'
+          java-version: '${{ matrix.java }}'
+      - name: Cache de paquetes Maven
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+      - name: Compilar el proyecto
+        run: mvn clean package -DskipTests
+        env:
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          NOMBRE_USR: ${{ secrets.NOMBRE_USR }}
+      - name: Ejecutar el proyecto
+        run: |
+          java -jar target/ejemplo02-0.0.1-SNAPSHOT.jar &
+          echo $! > springboot.pid
+        env:
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          NOMBRE_USR: ${{ secrets.NOMBRE_USR }}
+      - name: Esperar y probar un endpoint
+        run: |
+          sleep 30
+          curl http://localhost:8080/actuator/health
+      - name: Detener la aplicación
+        run: kill -9 $(cat springboot.pid)
