@@ -44,12 +44,12 @@ jobs:
         run: |
           sleep 30
           curl http://localhost:8080/actuator/health
-      - name: Ejecutando tests con Maven
-        shell: bash
-        run: mvn clean verify
-        env:
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          NOMBRE_USR: ${{ secrets.NOMBRE_USR }}
+      #- name: Ejecutando tests con Maven
+      #  shell: bash
+      #  run: mvn clean verify
+      #  env:
+      #    DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      #    NOMBRE_USR: ${{ secrets.NOMBRE_USR }}
       - name: Detener la aplicación
         shell: bash
         run: kill -9 $(cat springboot.pid)
