@@ -32,6 +32,7 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           NOMBRE_USR: ${{ secrets.NOMBRE_USR }}
       - name: Ejecutar el proyecto
+        shell: bash
         run: |
           java -jar target/ejemplo02-0.0.1-SNAPSHOT.jar &
           echo $! > springboot.pid
@@ -39,8 +40,10 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           NOMBRE_USR: ${{ secrets.NOMBRE_USR }}
       - name: Esperar y probar un endpoint
+        shell: bash
         run: |
           sleep 30
           curl http://localhost:8080/actuator/health
       - name: Detener la aplicación
+        shell: bash
         run: kill -9 $(cat springboot.pid)
