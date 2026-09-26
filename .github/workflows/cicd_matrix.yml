@@ -53,6 +53,15 @@ jobs:
       - name: Detener la aplicación
         shell: bash
         run: kill -9 $(cat springboot.pid)
+      - name: Ejecutar análisis de código con SonarQube
+        shell: bash  
+        run: mvn sonar:sonar \
+             -Dsonar.projectKey=WinTux_20260916 \
+             -Dsonar.host.url=https://sonarcloud.io \
+             -Dsonar.organization=wintux-1
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
   deploy:
     needs: compilacion-pruebas
     runs-on: ubuntu-latest
