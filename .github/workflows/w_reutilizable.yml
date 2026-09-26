@@ -1,0 +1,28 @@
+name: Build & test reutilizable
+on:
+    workflow_call:
+        inputs:
+            java-version:
+                required: true
+                type: string
+jobs:
+    build-y-test:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v6.1.0
+            - name: Configurar JDK ${{ inputs.java-version }}
+              uses: actions/setup-java@v6.0.1
+              with:
+                  distribution: 'temurin'
+                  java-version: '${{ inputs.java-version }}'
+            - name: Cache de paquetes Maven
+              uses: actions/cache@v4
+              with:
+                path: ~/.m2/repository
+                key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+            - name: Compilar el proyecto y pruebas
+              run: mvn clean verify
+              env:
+                DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+                NOMBRE_USR: ${{ secrets.NOMBRE_USR }}
