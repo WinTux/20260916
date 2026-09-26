@@ -27,7 +27,7 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
       - name: Compilar el proyecto
-        run: mvn clean package -DskipTests
+        run: mvn clean verify
         env:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           NOMBRE_USR: ${{ secrets.NOMBRE_USR }}
@@ -53,15 +53,17 @@ jobs:
       - name: Detener la aplicación
         shell: bash
         run: kill -9 $(cat springboot.pid)
-      - name: Ejecutar análisis de código con SonarQube
-        shell: bash  
-        run: mvn sonar:sonar \
-             -Dsonar.projectKey=WinTux_20260916 \
-             -Dsonar.host.url=https://sonarcloud.io \
-             -Dsonar.organization=wintux-1
+      - name: Ejecutar análisis de código con SonarCloud
+        shell: bash
+        run: |
+          mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.projectKey=WinTux_20260916 \
+            -Dsonar.organization=wintux-1 \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.token="${SONAR_TOKEN}"
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: https://sonarcloud.io
+
   deploy:
     needs: compilacion-pruebas
     runs-on: ubuntu-latest
