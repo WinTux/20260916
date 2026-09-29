@@ -1,0 +1,43 @@
+name: Generando Release Spring Boot
+on:
+    push:
+        tags:
+            - 'v*'
+jobs:
+    build-y-release:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write # Necesario para crear release
+        steps:
+            - name: Clonando proyecto
+              uses: actions/checkout@v6.1.0
+              with:
+                fetch-depth: 0 # Necesario para obtener tags
+            - name: Configurar JDK 25
+              uses: actions/setup-java@v6.0.1
+              with:
+                  distribution: 'temurin'
+                  java-version: '25'
+                  cache: maven
+            - name: Compilar Jar
+              run: mvn clean package -DskipTests
+              env:
+                DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+                NOMBRE_USR: ${{ secrets.NOMBRE_USR }}
+            # Generando el Release
+            - name: Crear Release
+              uses: softprops/action-gh-release@v3.0.0
+              with:
+                name: "Release ${{ github.ref_name }}"
+                body: |
+                  ## Cambios en esta versión
+                  - Se han agregado nuevas funcionalidades y mejoras.
+                  - Se han corregido errores reportados por los usuarios.
+                  - Mejoras en el rendimiento y la estabilidad de la aplicación.
+                draft: false
+                prerelease: false
+                generate_release_notes: true
+                files: |
+                  target/*.jar
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
