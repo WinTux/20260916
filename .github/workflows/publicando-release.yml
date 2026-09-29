@@ -34,6 +34,7 @@ jobs:
                   - Se han agregado nuevas funcionalidades y mejoras.
                   - Se han corregido errores reportados por los usuarios.
                   - Mejoras en el rendimiento y la estabilidad de la aplicación.
+                  - Se agregan pasos de ejecución en README.md
                 draft: false
                 prerelease: false
                 generate_release_notes: true
